@@ -1,23 +1,28 @@
 #pragma once
 
-#include "DataPod1.hpp"
-#include "MessageDataPod1.hpp"
+#include "OverallStructure.hpp"
 
-#include "DataPod2.hpp"
+#include "MessageDataPod1.hpp"
 #include "MessageDataPod2.hpp"
 
-void copy_data_pod_1(DataPod1& out, const MessageDataPod1& in_data)
+template<typename T>
+void copy_header(OverallStructure& out, const T& in_data)
 {
-    out.setDataField1(in_data.data_field_1);
-    out.setDataField2(in_data.data_field_2);
-
-    std::cout << out << "\n";
+    out.header = in_data.header;
 }
 
-void copy_data_pod_2(DataPod2& out, const MessageDataPod2& in_data)
+void copy_data_pod_1(OverallStructure& out, const MessageDataPod1& in_data)
 {
-    out.setDataField1(in_data.data_field_1);
-    out.setDataField2(in_data.data_field_2);
+    copy_header(out, in_data);
 
-    std::cout << out << "\n";
+    out.dataPod1.setDataField1(in_data.data_field_1);
+    out.dataPod1.setDataField2(in_data.data_field_2);
+}
+
+void copy_data_pod_2(OverallStructure& out, const MessageDataPod2& in_data)
+{
+    copy_header(out, in_data);
+    
+    out.dataPod2.setDataField1(in_data.data_field_1);
+    out.dataPod2.setDataField2(in_data.data_field_2);
 }

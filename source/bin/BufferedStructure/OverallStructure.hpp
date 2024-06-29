@@ -6,12 +6,6 @@
 
 #include <iostream>
 
-enum PodIDs
-{
-    DATA_POD_1,
-    DATA_POD_2
-};
-
 class OverallStructure
 {
 public:
