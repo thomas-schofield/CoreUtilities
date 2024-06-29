@@ -38,7 +38,7 @@ public:
         return entries.size();
     }
 
-    bool contains(int id)
+    bool contains(int id) const
     {
         std::lock_guard<std::mutex> lock(entries_mutex);
         return entries.end() != entries.find(id);
