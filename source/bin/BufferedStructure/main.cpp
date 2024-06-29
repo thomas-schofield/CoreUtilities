@@ -14,6 +14,8 @@
 template<typename T>
 struct identity { typedef T type; };
 
+using BufferedStructuresData = std::map<int, OverallStructure>;
+
 class BufferedStructures
 {
 public:
@@ -22,6 +24,7 @@ public:
     /*
      * T - Live data structure for the pod
      * MessageT - Implementation of the structure for messaging purposes
+     * We only want the latest data from whatever message comes in, so just copy overtop existing data
      */
     template<typename T, typename MessageT>
     void setPod(int structure_id, MessageT msg_data, const std::function<void(T&, const MessageT&)>& copy_func)
@@ -79,7 +82,11 @@ public:
         std::cout << "Number of entries: " << structures_map.size() << "\n";
     }
 
-    // TODO: Implement iterator to get all current data
+    BufferedStructuresData getData() const
+    {
+        std::lock_guard<std::mutex> lock(buffered_structures_mutex);
+        return structures_map;
+    }
 
 private:
     template<typename T>
@@ -105,7 +112,7 @@ private:
         return structures_map.at(structure_id).dataPod2;
     }
 
-    std::map<int, OverallStructure> structures_map;
+    BufferedStructuresData structures_map;
     mutable std::mutex buffered_structures_mutex;
 };
 
