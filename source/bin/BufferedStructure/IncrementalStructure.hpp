@@ -16,19 +16,15 @@ public:
     IncrementalStructure() = default;
     virtual ~IncrementalStructure() = default;
 
-    /*
-     * T - Live data structure for the pod
-     * MessageT - Implementation of the structure for messaging purposes
-     * We only want the latest data from whatever message comes in, so just copy overtop existing data
-     */
+    // We only want the latest data from whatever message comes in, so just copy overtop existing data
     template<typename MessageT>
     void set(int structure_id, MessageT msg_data, const std::function<void(Structure&, const MessageT&)>& copy_func)
     {
         try
         {
-            std::lock_guard<std::mutex> lock(buffered_structures_mutex);
+            std::lock_guard<std::mutex> lock(entries_mutex);
             // Make sure the structure is created if the entry wasn't there already
-            copy_func(structures_map[structure_id], msg_data);
+            copy_func(entries[structure_id], msg_data);
         }
         catch(const std::exception& e)
         {
@@ -38,22 +34,22 @@ public:
 
     std::size_t size() const
     {
-        std::lock_guard<std::mutex> lock(buffered_structures_mutex);
-        return structures_map.size();
+        std::lock_guard<std::mutex> lock(entries_mutex);
+        return entries.size();
     }
 
     bool contains(int id)
     {
-        std::lock_guard<std::mutex> lock(buffered_structures_mutex);
-        return structures_map.end() != structures_map.find(id);
+        std::lock_guard<std::mutex> lock(entries_mutex);
+        return entries.end() != entries.find(id);
     }
 
     bool copy(int id, Structure& output_struct) const
     {
         try
         {
-            std::lock_guard<std::mutex> lock(buffered_structures_mutex);
-            std::memcpy(&output_struct, &structures_map.at(id), sizeof(Structure));
+            std::lock_guard<std::mutex> lock(entries_mutex);
+            std::memcpy(&output_struct, &entries.at(id), sizeof(Structure));
             return true;
         }
         catch(const std::exception& e)
@@ -68,8 +64,8 @@ public:
     {
         try
         {
-            std::lock_guard<std::mutex> lock(buffered_structures_mutex);
-            structures_map.erase(id);
+            std::lock_guard<std::mutex> lock(entries_mutex);
+            entries.erase(id);
         }
         catch(const std::exception& e)
         {
@@ -79,6 +75,6 @@ public:
 
 protected:
 
-    Data structures_map;
-    mutable std::mutex buffered_structures_mutex;  
+    Data entries;
+    mutable std::mutex entries_mutex;  
 };
