@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${REPO_ROOT}/cmake)
 include(options)
 include(project)
 include(macros)
+include(dependencies)
 
 add_subdirectory(source)
 
