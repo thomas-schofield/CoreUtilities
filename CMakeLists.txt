@@ -4,6 +4,7 @@ project(CoreUtilities LANGUAGES CXX)
 
 set(REPO_ROOT ${PROJECT_SOURCE_DIR})
 
+# Add project cmake config directory to path
 set(CMAKE_MODULE_PATH ${REPO_ROOT}/cmake)
 
 include(options)
