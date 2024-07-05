@@ -18,7 +18,7 @@ public:
 
     // We only want the latest data from whatever message comes in, so just copy overtop existing data
     template<typename MessageT>
-    void set(int structure_id, MessageT msg_data, const std::function<void(Structure&, const MessageT&)>& copy_func)
+    void set(int structure_id, const MessageT& msg_data, const std::function<void(Structure&, const MessageT&)>& copy_func)
     {
         try
         {
@@ -36,6 +36,12 @@ public:
     {
         std::lock_guard<std::mutex> lock(entries_mutex);
         return entries.size();
+    }
+
+    bool empty() const
+    {
+        std::lock_guard<std::mutex> lock(entries_mutex);
+        return entries.empty();
     }
 
     bool contains(int id) const
