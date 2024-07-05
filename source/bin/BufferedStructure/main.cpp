@@ -8,11 +8,36 @@
 #include <string>
 #include <cstdlib>
 
+#include <boost/program_options.hpp>
+
+// Test that we can use boost in the project
+void parseOptions(boost::program_options::variables_map& opts, int argc, char** argv)
+{
+    boost::program_options::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "produce help message");
+
+    boost::program_options::store(
+        boost::program_options::parse_command_line(argc, argv, desc),
+        opts
+    );
+    boost::program_options::notify(opts);
+
+    if (opts.count("help"))
+    {
+        std::cout << desc << "\n";
+        exit(EXIT_SUCCESS);
+    }
+}
+
 /*
  * We have a server app that publishes individual fields of OverallStructure.
  */
-int main(void)
+int main(int argc, char** argv)
 {
+    boost::program_options::variables_map opts{};
+    parseOptions(opts, argc, argv);
+
     IncrementalStructure<OverallStructure> my_structure;
 
     MessageDataPod1 message1;
