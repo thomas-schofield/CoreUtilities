@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     boost::program_options::variables_map opts{};
     parseOptions(opts, argc, argv);
 
-    IncrementalStructure<OverallStructure> my_structure;
+    IncrementalStructure<int, OverallStructure> my_structure;
 
     MessageDataPod1 message1;
     message1.header.id = 1;

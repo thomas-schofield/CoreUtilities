@@ -7,18 +7,18 @@
 
 #include <iostream>
 
-template<typename Structure>
+template<typename Key, typename Structure>
 class IncrementalStructure
 {
 public:
-    using Data = std::map<int, Structure>;
+    using Data = std::map<Key, Structure>;
 
     IncrementalStructure() = default;
     virtual ~IncrementalStructure() = default;
 
     // We only want the latest data from whatever message comes in, so just copy overtop existing data
     template<typename MessageT>
-    void set(int structure_id, const MessageT& msg_data, const std::function<void(Structure&, const MessageT&)>& copy_func)
+    void set(Key structure_id, const MessageT& msg_data, const std::function<void(Structure&, const MessageT&)>& copy_func)
     {
         try
         {
@@ -44,13 +44,13 @@ public:
         return entries.empty();
     }
 
-    bool contains(int id) const
+    bool contains(Key id) const
     {
         std::lock_guard<std::mutex> lock(entries_mutex);
         return entries.end() != entries.find(id);
     }
 
-    bool copy(int id, Structure& output_struct) const
+    bool copy(Key id, Structure& output_struct) const
     {
         try
         {
@@ -66,7 +66,7 @@ public:
         return false;
     }
 
-    void remove(int id)
+    void remove(Key id)
     {
         try
         {
