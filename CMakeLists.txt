@@ -7,6 +7,8 @@ set(REPO_ROOT ${PROJECT_SOURCE_DIR})
 # Add project cmake config directory to path
 set(CMAKE_MODULE_PATH ${REPO_ROOT}/cmake)
 
+message("Building with CMake version: ${CMAKE_VERSION}")
+
 include(options)
 include(project)
 include(macros)
