@@ -1,1 +1,2 @@
 add_subdirectory(BufferedStructure)
+add_subdirectory(LibraryReader)
