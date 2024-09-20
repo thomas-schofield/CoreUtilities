@@ -1,8 +1,8 @@
 # Use options defined in options.cmake to eanble and disable specific compiler/linker flags
 
-# set(CMAKE_CXX_COMPILER /opt/homebrew/bin/g++-14)
-
-
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Global project features
 add_library(project_features INTERFACE)
