@@ -6,6 +6,3 @@ gtest/1.10.0
 [generators]
 CMakeDeps
 CMakeToolchain
-
-[layout]
-cmake_layout
