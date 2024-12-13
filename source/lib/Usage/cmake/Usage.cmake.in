@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(LoggingServices)
+find_dependency(SafeStrings)
+
+set(LIB_Usage Usage::Usage)
