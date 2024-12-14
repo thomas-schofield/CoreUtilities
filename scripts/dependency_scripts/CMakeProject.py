@@ -3,77 +3,73 @@ import re
 import os
 import sys
 
-import CMakeParser
+import CMakeTarget
 
 
 class CMakeProject:
+    """Retrieve information about a set of CMake Targets"""
     def __init__(self, project_dir: str):
-        if not os.path.isdir(project_dir):
-            raise Exception(f"{project_dir} is not a valid directory")
-
         self.project_dir = project_dir
-        self.project_file = os.path.join(self.project_dir, "CMakeLists.txt")
 
-    def isValidProject(self) -> bool:
-        try:
-            parser = CMakeParser.CMakeParser(self.project_file)
-            return parser.getProjectType() == CMakeParser.CMakeProjectType.LIBRARY
-        except Exception as e:
-            print(e)
-            return False
+        self.cache = True
+        self.project_name = None
+        self.project_targets = []
+        self.all_deps = []
 
-    def getProjectIncludes(self) -> list[str]:
-        includes = []
+    def setUseCache(self, state: bool):
+        self.cache = state
+    
+    def getProjectDirectory(self):
+        return self.project_dir
+    
+    def setProjectName(self, project_name: str) -> None:
+        self.project_name = project_name
+    
+    def getProjectName(self):
+        return self.project_name
 
-        if not self.isValidProject():
-            return includes
+    def getAllTargets(self):
+        if self.cache and self.project_targets:
+            return self.project_targets
 
-        project_files = os.listdir(self.project_dir)
-        for entry in project_files:
-            project_file = os.path.join(self.project_dir, entry)
-            if not os.path.isfile(project_file):
-                continue
-
-            if "cmake" in entry.lower():
-                continue
-
-            with open(project_file, "r") as f:
-                for line in f:
-                    if "#include" not in line:
+        for (root, _, files) in os.walk(self.project_dir):
+            if "CMakeLists.txt" in files:
+                try:
+                    project_target_file = os.path.join(root, "CMakeLists.txt")
+                    project_target = CMakeTarget.CMakeTarget(project_target_file)
+                    if not project_target.isValidTarget():
                         continue
 
-                    pattern = re.escape("<") + "(.*)" + re.escape(">")
-                    p = re.compile(pattern)
-                    system_include = p.findall(line)
-                    if system_include and system_include[0] not in project_files: 
-                        system_include = system_include[0]
-                        if system_include not in includes:
-                            includes.append(system_include)
-                            continue
+                    if project_target not in self.project_targets:
+                        self.project_targets.append(project_target)
+                except Exception as e:
+                    print(f"Caught exception: {e}")
 
-                    pattern = re.escape('"') + "(.*)" + re.escape('"')
-                    p = re.compile(pattern)
-                    local_include = p.findall(line)
-                    if local_include and local_include[0] not in project_files:
-                        local_include = local_include[0]
-                        if local_include not in includes:
-                            includes.append(local_include)
-                            continue
+        return self.project_targets
 
-        if len(includes) > 0:
-            includes.sort()
-        return includes
+    def getAllDependencies(self):
+        """Retrieve dependencies for all project targets, only returning unique results"""
+        if self.cache and self.all_deps:
+            return self.all_deps
 
-    def getDependencies(self):
-        raise NotImplementedError
+        _targets = self.getAllTargets()
+
+        for target in _targets:
+            _deps = target.getTargetDependencies()
+            for dep in _deps:
+                if dep not in self.all_deps:
+                    self.all_deps.append(dep)
+
+        self.all_deps.sort()
+        return self.all_deps
 
 
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
         project = CMakeProject(arg)
+        targets = project.getAllTargets()
+        for found_target in targets:
+            print(f"Resolved target: {found_target}")
 
-        includes = project.getProjectIncludes()
-        if includes:
-            print(f"Found includes: {includes}")
-        else:
-            print(f"No includes found for: {arg}")
+        deps = project.getAllDependencies()
+        print(f"Dependencies: {deps}")

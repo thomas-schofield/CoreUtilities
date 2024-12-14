@@ -11,21 +11,21 @@ class CMakeConfigureFile:
         self.cmake_file = cmake_file
         self.parser = CMakeParser.CMakeParser(cmake_file)
 
-    def createConfigureFile(self):
+    def create(self):
         target = self.parser.getTargetName()
         if target is None:
             print(f"Target not found in file: {self.cmake_file}")
             return
 
-        dependencies = self.parser.getDependencies()
-        project_type = self.parser.getProjectType()
-
-        if project_type != CMakeParser.CMakeProjectType.LIBRARY:
+        target_type = self.parser.getTargetType()
+        if target_type != CMakeParser.CMakeTargetType.LIBRARY:
             print(f"{target} is not a library, not creating configure file")
             return
 
+        dependencies = self.parser.getTargetDependencies()
+
         target_dir = os.path.dirname(self.cmake_file)
-        print(f"Target directory: {target_dir}")
+        print(f"Processing target directory: {target_dir}")
 
         print(f"Creating configure file for {target}")
         output_path = os.path.join(target_dir, "cmake")
@@ -48,4 +48,4 @@ class CMakeConfigureFile:
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
         dep_file = CMakeConfigureFile(arg)
-        dep_file.createConfigureFile()
+        dep_file.create()
