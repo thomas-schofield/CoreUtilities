@@ -8,8 +8,8 @@ import CMakeExportsFile
 
 
 class CMakeDependencyFile:
-    def __init__(self, project: CMakeProject.CMakeProject):
-        self.project = project
+    def __init__(self, in_project: CMakeProject.CMakeProject):
+        self.project = in_project
 
     def create(self, external_exports_files: list[str]):
         available_external_targets = self._getExternalExports(external_exports_files)
@@ -23,7 +23,7 @@ class CMakeDependencyFile:
                 targets_for_dependency_file.append(dependency)
         output_dir = self.project.getProjectDirectory()
         output_file = os.path.join(output_dir, "dependencies.cmake")
-        with open(output_file, "w") as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(f'message(STATUS "Finding core dependencies for {self.project.getProjectName()}")\n\n')
             f.write("# Only list core libraries below\n")
             for target in targets_for_dependency_file:
