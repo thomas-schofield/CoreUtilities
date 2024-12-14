@@ -1,4 +1,4 @@
-message(STATUS "Finding core dependencies for None")
+message(STATUS "Finding core dependencies for CoreUtilities-lib")
 
 # Only list core libraries below
 find_package(LoggingServices REQUIRED)

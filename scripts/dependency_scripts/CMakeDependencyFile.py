@@ -48,6 +48,7 @@ if __name__ == "__main__":
     project_dir = sys.argv[2]
     external_targets_files = [sys.argv[3]]
     project = CMakeProject.CMakeProject(project_dir)
+    project.setProjectName(project_name)
 
     dependency_file = CMakeDependencyFile(project)
     dependency_file.create(external_targets_files)
